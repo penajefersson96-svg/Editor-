@@ -1,1 +1,350 @@
-j
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>StudioX - Canva & CapCut Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       VISTA 1: PANTALLA DE INICIO (LOBBY CANVA/CAPCUT)
+       ========================================== -->
+  <div id="homeView" class="view active">
+    <header class="home-header">
+      <div class="brand-title">✨ Studio<span>X</span></div>
+      <div class="pro-badge">Todo Gratis • IA Local</div>
+    </header>
+
+    <div class="home-scroll">
+      <!-- Banner Buscador -->
+      <div class="hero-box">
+        <h2>¿Qué vas a diseñar hoy?</h2>
+        <p>Edición gráfica estilo Canva + Línea de tiempo estilo CapCut</p>
+      </div>
+
+      <!-- Formatos Rápidos -->
+      <h3 class="sec-title">Elige cómo empezar</h3>
+      <div class="quick-formats">
+        <button class="format-item" data-w="1080" data-h="1080" data-mode="canva">
+          <div class="f-icon bg-pink">🖼️</div>
+          <span>Post 1:1</span>
+        </button>
+        <button class="format-item" data-w="1080" data-h="1920" data-mode="canva">
+          <div class="f-icon bg-purple">📱</div>
+          <span>Historia 9:16</span>
+        </button>
+        <button class="format-item" data-w="1080" data-h="1920" data-mode="capcut">
+          <div class="f-icon bg-teal">🎬</div>
+          <span>Video CapCut</span>
+        </button>
+        <button class="format-item" id="btnQuickBgRemove">
+          <div class="f-icon bg-orange">✂️</div>
+          <span>Quitar Fondo</span>
+        </button>
+      </div>
+
+      <!-- Plantillas Publicitarias Editables -->
+      <h3 class="sec-title">Plantillas Publicitarias (100% Editables)</h3>
+      <div class="templates-grid">
+        <div class="template-card" data-tpl="burger">
+          <div class="tpl-preview tpl-burger">
+            <span class="tpl-tag">COMIDA / REEL</span>
+            <h4>SUPER BURGER</h4>
+            <p>$5.99</p>
+          </div>
+          <span>Anuncio Hamburguesa</span>
+        </div>
+
+        <div class="template-card" data-tpl="promo">
+          <div class="tpl-preview tpl-promo">
+            <span class="tpl-tag">OFERTA FLASH</span>
+            <h4>50% OFF</h4>
+            <p>SOLO HOY</p>
+          </div>
+          <span>Oferta de Impacto</span>
+        </div>
+
+        <div class="template-card" data-tpl="bakery">
+          <div class="tpl-preview tpl-bakery">
+            <span class="tpl-tag">PANADERÍA</span>
+            <h4>RECIÉN HORNEADO</h4>
+            <p>Pedidos Ya</p>
+          </div>
+          <span>Catálogo / Pastelería</span>
+        </div>
+
+        <div class="template-card" data-tpl="tech">
+          <div class="tpl-preview tpl-tech">
+            <span class="tpl-tag">PRODUCTO</span>
+            <h4>NUEVO INGRESO</h4>
+            <p>Envío Gratis</p>
+          </div>
+          <span>Producto Moderno</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       VISTA 2: EL EDITOR (MODO CANVA + MODO CAPCUT)
+       ========================================== -->
+  <div id="editorView" class="view">
+
+    <!-- Barra Superior -->
+    <header class="editor-topbar">
+      <button id="btnGoHome" class="icon-btn">🏠</button>
+
+      <!-- Interruptor Canva (Diseño) vs CapCut (Línea de tiempo) -->
+      <div class="mode-toggle">
+        <button id="btnModeCanva" class="mode-btn active">🎨 Diseño</button>
+        <button id="btnModeCapcut" class="mode-btn">🎬 Timeline</button>
+      </div>
+
+      <div class="top-actions">
+        <button id="btnUndo" class="icon-btn" title="Centrar capa">🎯</button>
+        <button id="btnExportModal" class="btn-export">Exportar</button>
+      </div>
+    </header>
+
+    <!-- Área Central del Lienzo -->
+    <main class="stage-container">
+      <div class="canvas-viewport">
+        <canvas id="studioCanvas" width="1080" height="1080"></canvas>
+      </div>
+
+      <!-- Píldora Flotante Superior (Aparece al tocar un objeto, igual a Canva) -->
+      <div id="floatingActions" class="floating-pill hidden">
+        <button id="actEditTxt" class="pill-btn" title="Editar texto">✏️</button>
+        <button id="actDuplicate" class="pill-btn" title="Duplicar">➕</button>
+        <button id="actLayerUp" class="pill-btn" title="Subir capa">⬆️</button>
+        <button id="actLayerDown" class="pill-btn" title="Bajar capa">⬇️</button>
+        <button id="actDelete" class="pill-btn danger" title="Borrar">🗑️</button>
+      </div>
+
+      <!-- Pantalla de Carga IA -->
+      <div id="aiOverlay" class="ai-overlay hidden">
+        <div class="spinner"></div>
+        <p id="aiMsg">Procesando recorte con IA...</p>
+      </div>
+    </main>
+
+    <!-- Barra de Reproducción y Línea de Tiempo (MODO CAPCUT) -->
+    <section id="capcutTimeline" class="capcut-area hidden">
+      <div class="playback-controls">
+        <span id="timeDisplay">00:00 / 00:10</span>
+        <button id="btnPlayTimeline" class="play-btn">▶️</button>
+        <button id="btnMuteVideo" class="mini-btn">🔊 Audio</button>
+      </div>
+
+      <!-- Pistas Multipista -->
+      <div class="timeline-tracks">
+        <!-- Regla de Tiempo -->
+        <div class="time-ruler">
+          <span>00:00</span><span>00:02</span><span>00:04</span><span>00:06</span><span>00:08</span><span>00:10</span>
+        </div>
+
+        <!-- Deslizador del Cabezal (Playhead) -->
+        <input type="range" id="timelineScrubber" class="scrubber" min="0" max="10" step="0.05" value="0">
+
+        <!-- Pista 1: Video / Fondo -->
+        <div class="track-row" id="trackBg">
+          <div class="track-label">🎞️ Fondo</div>
+          <div class="track-bar video-track" id="btnChangeBgVideo">
+            <span>Clip Principal (Toca para subir Video/Foto)</span>
+          </div>
+        </div>
+
+        <!-- Pista 2: Audio -->
+        <div class="track-row">
+          <div class="track-label">🎵 Audio</div>
+          <label class="track-bar audio-track">
+            <span id="audioTrackText">+ Agregar audio (MP3/WAV)</span>
+            <input type="file" id="inputAudioFile" accept="audio/*" hidden>
+          </label>
+        </div>
+
+        <!-- Pista 3: Capa Seleccionada (Tiempo de inicio y fin) -->
+        <div class="track-row">
+          <div class="track-label">⏱️ Capa</div>
+          <div class="track-timing">
+            <label>Inicia: <input type="number" id="layerStart" min="0" max="9" step="0.5" value="0">s</label>
+            <label>Termina: <input type="number" id="layerEnd" min="1" max="10" step="0.5" value="10">s</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de Propiedades Contextuales (Aparece al seleccionar una capa) -->
+    <div id="contextToolbar" class="context-bar hidden">
+      <!-- Controles para Texto -->
+      <div id="ctxTextTools" class="ctx-group hidden">
+        <button id="btnOpenTextPrompt" class="ctx-chip">✏️ Cambiar Texto</button>
+        <select id="selFont" class="ctx-select">
+          <option value="sans-serif">Moderna</option>
+          <option value="Impact, sans-serif">Impacto</option>
+          <option value="Georgia, serif">Elegante</option>
+          <option value="Courier New, monospace">Código</option>
+        </select>
+        <label class="ctx-color">Color <input type="color" id="inpLayerColor" value="#ffffff"></label>
+        <label class="ctx-color">Caja <input type="color" id="inpBgBoxColor" value="#ff0055"></label>
+        <button id="btnToggleBox" class="ctx-chip">Fondo Sí/No</button>
+      </div>
+
+      <!-- Controles para Imagen / Producto -->
+      <div id="ctxImageTools" class="ctx-group hidden">
+        <button id="btnRunAiCut" class="ctx-chip ai-glow">✨ Quitar Fondo IA</button>
+        <button id="btnOpenChroma" class="ctx-chip">🎨 Borrar Color</button>
+        <button id="btnOpenAdjust" class="ctx-chip">☀️ Ajustar / Sombra</button>
+        <button id="btnSwapImg" class="ctx-chip">🔄 Reemplazar</button>
+      </div>
+
+      <!-- Controles Comunes: Animación y Opacidad -->
+      <div class="ctx-group">
+        <select id="selAnimation" class="ctx-select">
+          <option value="none">Sin Animación</option>
+          <option value="pulse">Latido (Oferta)</option>
+          <option value="float">Flotar Suave</option>
+          <option value="zoomIn">Entrada Zoom</option>
+          <option value="slideUp">Subir Rápido</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Cajón Deslizable Estilo Canva (Elementos, Plantillas, Subidos, Ajustes) -->
+    <div id="bottomSheet" class="bottom-sheet hidden">
+      <div class="sheet-handle-bar">
+        <span id="sheetTitle">Elementos</span>
+        <button id="btnCloseSheet" class="close-sheet">✕</button>
+      </div>
+
+      <!-- CONTENIDO 1: ELEMENTOS (Como tu captura 1 de Canva) -->
+      <div id="sheet-elementos" class="sheet-body">
+        <p class="sub-label">Formas (Toca para insertar)</p>
+        <div class="elements-row">
+          <button class="el-box" data-shape="rect"><div class="sh-rect"></div><span>Rectángulo</span></button>
+          <button class="el-box" data-shape="circle"><div class="sh-circle"></div><span>Círculo</span></button>
+          <button class="el-box" data-shape="pill"><div class="sh-pill"></div><span>Botón</span></button>
+          <button class="el-box" data-shape="star"><div class="sh-star">★</div><span>Estrella</span></button>
+        </div>
+
+        <p class="sub-label">Marcos para Fotos (Recortan tu foto automáticamente)</p>
+        <div class="elements-row">
+          <button class="el-box frame-btn" data-frame="circle">⭕<span>Marco Circular</span></button>
+          <button class="el-box frame-btn" data-frame="rounded">🔲<span>Marco Redondo</span></button>
+          <button class="el-box frame-btn" data-frame="diamond">🔶<span>Rombo</span></button>
+        </div>
+
+        <p class="sub-label">Stickers Publicitarios</p>
+        <div class="stickers-wrap">
+          <button class="st-chip" data-st="🔥 ¡OFERTA!" data-bg="#ff0055">🔥 ¡OFERTA!</button>
+          <button class="st-chip" data-st="🛵 DELIVERY GRATIS" data-bg="#00b09b">🛵 DELIVERY</button>
+          <button class="st-chip" data-st="⭐ NUEVO" data-bg="#7928ca">⭐ NUEVO</button>
+          <button class="st-chip" data-st="💥 2x1 HOY" data-bg="#ff8008">💥 2x1 HOY</button>
+          <button class="st-chip" data-st="📲 ESCRÍBENOS" data-bg="#25d366">📲 WHATSAPP</button>
+          <button class="st-chip" data-st="✅ DISPONIBLE" data-bg="#00c4cc">✅ DISPONIBLE</button>
+        </div>
+      </div>
+
+      <!-- CONTENIDO 2: TEXTO -->
+      <div id="sheet-texto" class="sheet-body">
+        <button id="btnAddHeading" class="text-preset-btn h1-btn">+ Agregar un título grande</button>
+        <button id="btnAddSub" class="text-preset-btn h2-btn">+ Agregar un subtítulo o precio</button>
+        <button id="btnAddBody" class="text-preset-btn p-btn">+ Agregar texto pequeño</button>
+      </div>
+
+      <!-- CONTENIDO 3: GALERÍA / SUBIR ARCHIVOS -->
+      <div id="sheet-galeria" class="sheet-body">
+        <div class="upload-grid">
+          <label class="big-upload-card purple-grad">
+            <span>📦</span>
+            <strong>Subir Foto / Producto</strong>
+            <small>Se añade como capa móvil</small>
+            <input type="file" id="inpUploadLayerImg" accept="image/*" hidden>
+          </label>
+
+          <label class="big-upload-card teal-grad">
+            <span>🎬</span>
+            <strong>Fondo (Video o Foto)</strong>
+            <small>Cubre todo el lienzo</small>
+            <input type="file" id="inpUploadBgMedia" accept="image/*,video/*" hidden>
+          </label>
+        </div>
+      </div>
+
+      <!-- CONTENIDO 4: FONDO Y AJUSTES DE IMAGEN -->
+      <div id="sheet-ajustes" class="sheet-body">
+        <p class="sub-label">Colores de Fondo del Lienzo</p>
+        <div class="grad-list">
+          <button class="g-circle" data-c1="#0f0c29" data-c2="#302b63" style="background:linear-gradient(135deg,#0f0c29,#302b63)"></button>
+          <button class="g-circle" data-c1="#ff416c" data-c2="#ff4b2b" style="background:linear-gradient(135deg,#ff416c,#ff4b2b)"></button>
+          <button class="g-circle" data-c1="#11998e" data-c2="#38ef7d" style="background:linear-gradient(135deg,#11998e,#38ef7d)"></button>
+          <button class="g-circle" data-c1="#f7971e" data-c2="#ffd200" style="background:linear-gradient(135deg,#f7971e,#ffd200)"></button>
+          <button class="g-circle" data-c1="#ffffff" data-c2="#e4e5e6" style="background:linear-gradient(135deg,#fff,#ccc)"></button>
+          <input type="color" id="customBg1" value="#0f0c29">
+          <input type="color" id="customBg2" value="#302b63">
+        </div>
+
+        <p class="sub-label" style="margin-top:10px;">Filtros y Borrador de Color (Capa Activa)</p>
+        <div class="adjust-sliders">
+          <label>Brillo <input type="range" id="adjBright" min="50" max="150" value="100"></label>
+          <label>Contraste <input type="range" id="adjContrast" min="50" max="150" value="100"></label>
+          <label>Sombra 3D <input type="range" id="adjShadow" min="0" max="80" value="25"></label>
+          <div class="chroma-inline">
+            <label><input type="checkbox" id="chkChromaKey"> Borrar Color:</label>
+            <input type="color" id="colChromaKey" value="#ffffff">
+            <input type="range" id="tolChromaKey" min="5" max="130" value="40">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Navegación Inferior Principal (Como Canva y CapCut) -->
+    <nav class="bottom-dock">
+      <button class="dock-btn" data-sheet="sheet-elementos" data-title="Elementos, Formas y Marcos">
+        <span class="d-ico">❖</span>
+        <span>Elementos</span>
+      </button>
+      <button class="dock-btn" data-sheet="sheet-texto" data-title="Agregar Texto">
+        <span class="d-ico">T</span>
+        <span>Texto</span>
+      </button>
+      <button class="dock-btn" data-sheet="sheet-galeria" data-title="Subir Fotos, Videos y Productos">
+        <span class="d-ico">📷</span>
+        <span>Galería</span>
+      </button>
+      <button class="dock-btn" data-sheet="sheet-ajustes" data-title="Fondo, Colores y Efectos">
+        <span class="d-ico">🎨</span>
+        <span>Ajustes</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==========================================
+       MODAL DE EXPORTACIÓN (FOTO PNG O VIDEO CON AUDIO)
+       ========================================== -->
+  <div id="exportModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3>Exportar Proyecto</h3>
+      <p>Elige cómo deseas guardar tu diseño en tu teléfono:</p>
+      <div class="modal-actions">
+        <button id="btnDownloadPng" class="exp-option-btn">
+          🖼️ Guardar como Imagen (PNG Alta Calidad)
+        </button>
+        <button id="btnRecordWebm" class="exp-option-btn video-opt">
+          🎥 Grabar Video con Animaciones y Audio (5 seg)
+        </button>
+      </div>
+      <button id="btnCloseExport" class="btn-cancel">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Multimedia oculto para procesamiento -->
+  <video id="bgVideoEl" playsinline crossorigin="anonymous" loop style="display:none;"></video>
+  <audio id="bgAudioEl" crossorigin="anonymous" loop style="display:none;"></audio>
+  <input type="file" id="inpSwapFile" accept="image/*" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>
